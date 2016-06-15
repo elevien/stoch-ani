@@ -7,6 +7,10 @@
 
 <body>
 	<!-- Page elements and content go here. -->
+	<body>
+	<button id="start">Animation</button>
+	<button id="reset">Reset</button>
+	<script>
 
 	<script>
 	// Our D3 code will go here.
@@ -21,10 +25,10 @@
 	}, function(error, rows) { // catch error if error, read rows
 		dat = rows; // set ratData equal to rows
 		console.log(rows);
-		createVisualization(); // call function to create chart
+		//createVisualization(); // call function to create chart
 	});
 
-	function createVisualization(){
+	d3.select("#start").on("click", function() {
 		//Width and height
 		var w = 1000;
 		var h = 400;
@@ -50,7 +54,7 @@
 				return (d.pos/xMax+1)*h/2.;
 		   })
 		   .attr("r", 4);
-	}
+	};)
 </script>
 	
 </body>
