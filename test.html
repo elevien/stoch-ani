@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>I'm Learning D3</title>
+	<!-- Load the D3 library here -->
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+
+<body>
+	<!-- Page elements and content go here. -->
+
+	<script>
+	// Our D3 code will go here.
+	var dat = [];
+	var dat2 = [1,2,3,4,5];
+
+	d3.csv("data.csv", function(d) {
+		return {
+			time : +d.time, 
+			pos : +d.pos
+		};
+	}, function(error, rows) { // catch error if error, read rows
+		dat = rows; // set ratData equal to rows
+		console.log(rows);
+		createVisualization(); // call function to create chart
+	});
+
+	function createVisualization(){
+		//Width and height
+		var w = 1000;
+		var h = 400;
+		
+		var tMax = d3.max(dat, function(d) { return d.time;} ); 
+		var xMax = d3.max(dat, function(d) { return d.pos;} ); 
+
+		//Create SVG element
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h)
+					//.attr("style", "outline: thin solid black;");
+
+		svg.selectAll("circle")
+		   .data(dat)
+		   .enter()
+		   .append("circle")
+		   .attr("cx", function(d) {
+				return (d.time/tMax)*w;
+		   })
+		   .attr("cy", function(d) {
+				return (d.pos/xMax+1)*h/2.;
+		   })
+		   .attr("r", 4);
+	}
+</script>
+	
+</body>
+</html>
