@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.circle {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+</style>
+<head>
+	<title>Test</title>
+	   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	   <script src="https://d3js.org/d3-timer.v1.min.js"></script> 
+	   <script src="https://d3js.org/d3-random.v1.min.js"></script>
+</head>
+
+<body>
+	<!-- Page elements and content go here. -->
+	<body>
+
+	<script>
+	
+	// Model paramaters
+	var alpha = 0.001
+	var beta = 0.001
+	var mu = 10.
+	var lam = 0.0005
+	// SETUP
+	
+	var r = 20;
+	var X1 = r;
+	var X2 = 0;
+	var Y1 = 1;
+	var Y2 = 0;
+	
+	var historyx1 = [];
+	var historyx2 = [];
+
+
+	var w = 1000;
+	var h = 400;
+	var drawFlag = true
+	var dt = 100
+	var color = "black"
+	
+	var xMax = d3.max(X1, function(d) { return d;} ); 
+	
+	var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h)
+					.attr("style", "outline: thin solid black;");
+
+	var pointx1  = svg
+		   .append("circle")
+		   .attr("cx", function(d) {return w-20; })
+		   .attr("cy", function(d) {return h-(X1/r)*h;})
+		   .attr("r", 4);
+		   
+	// var pointx2  = svg
+// 		   .append("circle")
+// 		   .attr("cx", function(d) {return w-20; })
+// 		   .attr("cy", function(d) {return h-(X1/r)*h;})
+// 		   .attr("r", 10).attr("fill","red");
+		   
+
+	    
+	var lineFunction = d3.svg.line()
+		.x(function(d) { return d[0]; })
+ 		.y(function(d) { return d[1]; })
+		.interpolate("basis");
+		
+	var pathx1 = svg.append("path")
+		 .attr("d", lineFunction(historyx1))
+		.attr("stroke", "black")
+		.attr("stroke-width", 2)
+		.attr("fill", "none");
+	// var pathx2 = svg.append("path")
+// 		 .attr("d", lineFunction(historyx2))
+// 		.attr("stroke", "red")
+// 		.attr("stroke-width", 2)
+// 		.attr("fill", "none");
+	
+	// ANIMATE	
+	var anim = d3.interval(function (elapsed) {if (drawFlag) {draw(elapsed);}},dt);
+	
+
+	function draw(elapsed) {
+	
+		// Take step in simulations 
+	    step()	
+	
+		
+
+		
+		// update point data
+		pointx1.data([X1]);
+		//pointx2.data([X2]);
+		
+		// animate step 
+		pointx1
+			.transition()
+			.duration(dt/5.) 
+			.ease("linear") 
+			.attr("cy", function(d) {return h-(d/r)*h;})
+			
+		// pointx2
+// 			.transition()
+// 			.duration(dt/5.) 
+// 			.ease("linear") 
+// 			.attr("cy", function(d) {return h-(d/r)*h;})
+		
+		pathx1.transition().duration(dt).attr("d", lineFunction(historyx1))
+		
+		d3.selectAll("path").attr("stroke", color)
+		pointx1.attr("fill", color)
+		//pathx2.transition().duration(dt).attr("d", lineFunction(historyx2))
+	
+	
+		   
+       
+    }
+    
+    function step() {
+    	// Use tau-leaping with tau = dt for x
+    	rightJumps = poisson(X1*Y1*alpha)
+    	rightLeft = poisson(X2*Y2*beta)
+    	
+   		X1=X1 -rightJumps + rightLeft;
+		X2=X2 +rightJumps - rightLeft;
+
+    	// for y we don't want to use tau-leaping since
+    	// it is easy for them to become negative
+    	nextYjump = d3.randomExponential(lam)()
+    	if (nextYjump<dt) {
+    		// swap Y1 and Y2
+    		Y1 = 1.-Y1
+    		Y2 = 1.-Y2
+    		if (color == "black"){
+				color = "red"
+			}else
+			{
+				color = "black"
+			}
+		}
+		
+    
+		// Update history 
+		historyx1.push([w-20,h-(X1/r)*h])
+		historyx2.push([w-20,h-(X2/r)*h])
+		for(var i=0;i<historyx1.length-1;i++){
+			historyx1[i][0]=historyx1[i][0] - 2;
+			historyx2[i][0]=historyx2[i][0] - 2 ; 
+		}
+    }
+    
+    function poisson(rate) {
+    	L = d3.randomExponential(rate)();
+    	if (L<dt) {
+    		// swap Y1 and Y2
+    		return 1.
+		}else{
+			return 0.
+		}
+		
+     	// count = 0.
+//      	p = 1.
+//      	while (p>L) {
+//      		count = count+1
+//      		u = d3.randomUniform(0,1)();
+//     		p = p*u
+//     		console.log(p)
+//  		}	
+//  		console.log(count)
+//  		return count
+
+    
+    }
+
+</script>
+	
+</body>
+</html>

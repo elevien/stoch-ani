@@ -28,14 +28,14 @@
 	// SETUP
 	
 	var x1 = [2];
-	var history = [[0,0],[20,30],[40,50]];
+	var history = [];
 	var dat2 = [10,10,10,10,10,10,10,10,10,10,10];
 
 
 	var w = 1000;
 	var h = 400;
 	var drawFlag = true
-	var frameRate = 500
+	var frameRate = 100
 	var xMax = d3.max(x1, function(d) { return d;} ); 
 	
 	var svg = d3.select("body")
@@ -48,7 +48,7 @@
 		   .data(x1)
 		   .enter()
 		   .append("circle")
-		   .attr("cx", function(d) {return (d/xMax)*w; })
+		   .attr("cx", function(d) {return w-20; })
 		   .attr("cy", function(d) {return 50.;})
 		   .attr("r", 4);
 		   
@@ -61,7 +61,7 @@
 		
 	var path = svg.append("path")
 		 .attr("d", lineFunction(history))
-		.attr("stroke", "blue")
+		.attr("stroke", "black")
 		.attr("stroke-width", 2)
 		.attr("fill", "none");
 	
@@ -77,10 +77,11 @@
 	    	
 
 		x1[0]=x1[0] + (Math.random()-0.5)*50 ; 
-		history.push([h,x1[0]])
-		for(var i=0;i<dat.length;i++){
-			dat[i]=dat[i] + (Math.random()-0.5)*50 ; 
-			console.log(dat[i])
+		history.push([w-20,x1[0]+100])
+		for(var i=0;i<history.length-1;i++){
+			history[i][0]=history[i][0] - 10 ; 
+		}
+		console.log(history)
 
 		
 		// update point data
@@ -88,10 +89,12 @@
 		
 		// animate step 
 		points
- 	 	.transition() 
-		.duration(frameRate) 
-		.ease("linear") 
-		.attr("cy", function(d) {return d;})
+			.transition()
+			.duration(frameRate/5.) 
+			.ease("linear") 
+			.attr("cy", function(d) {return d+100;})
+			
+		path.transition().duration(frameRate).attr("d", lineFunction(history))
 	
 	
 		   
