@@ -25,9 +25,10 @@
 	<body>
 
 	<script>
-	// Our D3 code will go here.
-	//var dat = [];
-	var dat = [2];
+	// SETUP
+	
+	var x1 = [2];
+	var history = [[0,0],[20,30],[40,50]];
 	var dat2 = [10,10,10,10,10,10,10,10,10,10,10];
 
 
@@ -35,7 +36,7 @@
 	var h = 400;
 	var drawFlag = true
 	var frameRate = 500
-	var xMax = d3.max(dat, function(d) { return d;} ); 
+	var xMax = d3.max(x1, function(d) { return d;} ); 
 	
 	var svg = d3.select("body")
 					.append("svg")
@@ -43,31 +44,47 @@
 					.attr("height", h)
 					.attr("style", "outline: thin solid black;");
 
-		
-	var anim = d3.interval(function (elapsed) {if (drawFlag) {draw(elapsed);}},frameRate);
-	
 	var points  = svg.selectAll("circle")
-		   .data(dat)
+		   .data(x1)
 		   .enter()
 		   .append("circle")
 		   .attr("cx", function(d) {return (d/xMax)*w; })
 		   .attr("cy", function(d) {return 50.;})
 		   .attr("r", 4);
+		   
+
+	    
+	var lineFunction = d3.svg.line()
+		.x(function(d) { return d[0]; })
+ 		.y(function(d) { return d[1]; })
+		.interpolate("linear");
+		
+	var path = svg.append("path")
+		 .attr("d", lineFunction(history))
+		.attr("stroke", "blue")
+		.attr("stroke-width", 2)
+		.attr("fill", "none");
 	
+	// ANIMATE	
+	var anim = d3.interval(function (elapsed) {if (drawFlag) {draw(elapsed);}},frameRate);
+	
+
 	function draw(elapsed) {
 	
 		// Take step in simulations 
-		//dat.forEach(function(d) {
+		//x1.forEach(function(d) {
 	    //	d = d + Math.floor(Math.random() *h)});
 	    	
-	    for(var i=0;i<dat.length;i++){
+
+		x1[0]=x1[0] + (Math.random()-0.5)*50 ; 
+		history.push([h,x1[0]])
+		for(var i=0;i<dat.length;i++){
 			dat[i]=dat[i] + (Math.random()-0.5)*50 ; 
 			console.log(dat[i])
-    	}
 
-		console.log(dat)
+		
 		// update point data
-		points.data(dat);
+		points.data(x1);
 		
 		// animate step 
 		points
@@ -75,11 +92,8 @@
 		.duration(frameRate) 
 		.ease("linear") 
 		.attr("cy", function(d) {return d;})
-		//.attr("r", function() {return Math.floor(Math.random() *40.);})
-		
-		// console.log(Math.floor(Math.random() * 100));
-
-  		
+	
+	
 		   
        
     }
