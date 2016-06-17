@@ -37,39 +37,43 @@
 	var r = 20;
 	var X1 = r;
 	var X2 = 0;
+	var Z1 = r;
+	var Z2 = 0;
 	var Y1 = 1;
 	var Y2 = 0;
 	
-	var historyx1 = [];
-	var historyx2 = [];
+	var historyX1 = [];
+	var historyX2 = [];
+	
+	var historyZ1 = [];
+	var historyZ2 = [];
 
 
-	var w = 1000;
-	var h = 400;
+	var w = 600;
+	var h = 300;
 	var drawFlag = true
-	var dt = 100
+	var dt = 50
 	var color = "black"
 	
 	var xMax = d3.max(X1, function(d) { return d;} ); 
 	
 	var svg = d3.select("body")
 					.append("svg")
-					.attr("width", w)
-					.attr("height", h)
-					.attr("style", "outline: thin solid black;");
+					.attr("width", w+10)
+					.attr("height", h+10)
+					//.attr("style", "steelblue");
 
-	var pointx1  = svg
+	var pointX1  = svg
 		   .append("circle")
 		   .attr("cx", function(d) {return w-20; })
 		   .attr("cy", function(d) {return h-(X1/r)*h;})
-		   .attr("r", 4);
-		   
-	// var pointx2  = svg
-// 		   .append("circle")
-// 		   .attr("cx", function(d) {return w-20; })
-// 		   .attr("cy", function(d) {return h-(X1/r)*h;})
-// 		   .attr("r", 10).attr("fill","red");
-		   
+		   .attr("r", 4).attr("fill","steelblue");
+	
+	var pointZ1  = svg
+		   .append("circle")
+		   .attr("cx", function(d) {return w-20; })
+		   .attr("cy", function(d) {return h-(X1/r)*h;})
+		   .attr("r", 4).attr("fill","black");
 
 	    
 	var lineFunction = d3.svg.line()
@@ -77,16 +81,42 @@
  		.y(function(d) { return d[1]; })
 		.interpolate("basis");
 		
-	var pathx1 = svg.append("path")
-		 .attr("d", lineFunction(historyx1))
+	var pathX1 = svg.append("path")
+		 .attr("d", lineFunction(historyX1))
+		.attr("stroke", "steelblue")
+		.attr("stroke-width", 2)
+		.attr("fill", "none");
+	
+	var pathZ1 = svg.append("path")
+		 .attr("d", lineFunction(historyZ1))
 		.attr("stroke", "black")
 		.attr("stroke-width", 2)
 		.attr("fill", "none");
-	// var pathx2 = svg.append("path")
-// 		 .attr("d", lineFunction(historyx2))
-// 		.attr("stroke", "red")
-// 		.attr("stroke-width", 2)
-// 		.attr("fill", "none");
+	
+	// Create y-axis
+	svg.append("line")
+		.attr("x1", 0)
+		.attr("y1", h)
+		.attr("x2", w)
+		.attr("y2", h)
+		.attr("stroke-width", 3)
+		.attr("stroke", "black");
+	// Create x-axis
+	svg.append("line")
+		.attr("x1", 0)
+		.attr("y1", h)
+		.attr("x2", 0)
+		.attr("y2", 0)
+		.attr("stroke-width", 3)
+		.attr("stroke", "black");
+		// y-axis label
+	svg.append("text")
+			.attr("class", "y label")
+			.attr("text-anchor", "end")
+			.text("No. of Particles")
+			.attr("transform", "translate(20, 20) rotate(-90)")
+			.attr("font-size", "20px")
+			.attr("font-family", "'Open Sans', sans-serif");
 	
 	// ANIMATE	
 	var anim = d3.interval(function (elapsed) {if (drawFlag) {draw(elapsed);}},dt);
@@ -96,32 +126,37 @@
 	
 		// Take step in simulations 
 	    step()	
-	
-		
-
-		
+	    
 		// update point data
-		pointx1.data([X1]);
-		//pointx2.data([X2]);
+		pointX1.data([X1]);
+		pointZ1.data([Z1]);
 		
 		// animate step 
-		pointx1
+		pointX1
 			.transition()
 			.duration(dt/5.) 
 			.ease("linear") 
 			.attr("cy", function(d) {return h-(d/r)*h;})
-			
-		// pointx2
-// 			.transition()
-// 			.duration(dt/5.) 
-// 			.ease("linear") 
-// 			.attr("cy", function(d) {return h-(d/r)*h;})
 		
-		pathx1.transition().duration(dt).attr("d", lineFunction(historyx1))
+		pointZ1
+			.transition()
+			.duration(dt/5.) 
+			.ease("linear") 
+			.attr("cy", function(d) {return h-(d/r)*h;})
 		
-		d3.selectAll("path").attr("stroke", color)
-		pointx1.attr("fill", color)
-		//pathx2.transition().duration(dt).attr("d", lineFunction(historyx2))
+		pathX1.transition().duration(dt).attr("d", lineFunction(historyX1))
+		pathZ1.transition().duration(dt).attr("d", lineFunction(historyZ1))
+		
+		
+		// if (Y1 = 0.){
+// 			color = "red"
+// 		}else
+// 		{
+// 			color = "black"
+// 		}
+		//d3.selectAll("path").attr("stroke", color)
+		//pointx1.attr("fill", color)
+		//pathx2.transition().duration(dt).attr("d", lineFunction(historyX2))
 	
 	
 		   
@@ -136,6 +171,10 @@
    		X1=X1 -rightJumps + rightLeft;
 		X2=X2 +rightJumps - rightLeft;
 
+		// Use forward Euler for Z
+		Z1 = Z1- dt*(Z1*Y1*alpha-Z2*Y2*beta)
+		Z2 = Z2+ dt*(Z1*Y1*alpha-Z2*Y2*beta)
+		
     	// for y we don't want to use tau-leaping since
     	// it is easy for them to become negative
     	nextYjump = d3.randomExponential(lam)()
@@ -143,21 +182,16 @@
     		// swap Y1 and Y2
     		Y1 = 1.-Y1
     		Y2 = 1.-Y2
-    		if (color == "black"){
-				color = "red"
-			}else
-			{
-				color = "black"
-			}
+    		
 		}
 		
     
 		// Update history 
-		historyx1.push([w-20,h-(X1/r)*h])
-		historyx2.push([w-20,h-(X2/r)*h])
-		for(var i=0;i<historyx1.length-1;i++){
-			historyx1[i][0]=historyx1[i][0] - 2;
-			historyx2[i][0]=historyx2[i][0] - 2 ; 
+		historyX1.push([w-20,h-(X1/r)*h])
+		historyZ1.push([w-20,h-(Z1/r)*h])
+		for(var i=0;i<historyX1.length-1;i++){
+			historyX1[i][0]=historyX1[i][0] - 2;
+			historyZ1[i][0]=historyZ1[i][0] - 2 ; 
 		}
     }
     
