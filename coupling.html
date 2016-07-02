@@ -71,32 +71,30 @@ slider .handle {
 </head>
 
 <body>
-<h2>Multiscale Chemical Reaction Networks and Piecewise deterministic Markov Processes </h2>
+<h2>Partial thermodynamic limits and variance reduction </h2>
 <p>
 
-This animation demonstrate how a multiscale population converges to a 
+This animation demonstrate how a multiscale population model converges to a 
 piecewise deterministic Markov process (PDMP). In particular consider the reaction network given by
 
-      \[\begin{align}
-     X_1+Y_1&\underset{\alpha}{\to} X_2+Y_1\\
-X_2 +Y_2&\underset{\beta}{\to} X_1+Y_2\\
+\[\begin{align}
+Y_1&\underset{\alpha}{\to} Y_1+X_1\\
+X_1&\underset{\beta}{\to}  \emptyset\\
 Y_1&\underset{\lambda}{\to} Y_2\\
-Y_2&\underset{\mu}{\to} Y_1.
-      \end{align}\]
+Y_2&\underset{\mu}{\to} Y_1
+ \end{align}\]
   
 In this reaction scheme the $ Y_i$ species catalyses the conversion of 
 the $X_i$ species.  If the conserved quantity $X_1+X_2 = r$ becomes large while $Y_1+Y_2= l$ remains fixed the 
-dynamics governing the concentrations $[X_i]$ becomes deterministic in between fluctuations in $Y_i$. More specifically, 
-it has been shown that in the limit $r \to \infty$, $X_ir^{-1} \to Z_i$ where $Z_i$ is a PDMP, 
-where here the convergence is in distribution. 
+dynamics governing the concentrations $[X_i]$ becomes deterministic between fluctuations in $Y_i$. More specifically, 
+it has been shown that as $r \to \infty$, $X_ir^{-1} \to Z_i$ where $Z_i$ is a PDMP, 
+here the convergence is in distribution. 
 
  </p>
 <p>
 <script src="coupling_ani.js"></script>
-<script> animate(2)() </script>
 <script> animate(10)() </script>
-<script> animate(100)() </script>
-<script> animate(1000)() </script>
+<script> animate(500)() </script>
 </p>
 
 

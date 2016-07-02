@@ -8,6 +8,7 @@ function animate(systemSize) {
 	// SETUP
 	
 	var r =systemSize;
+	
 	var X1 = r;
 	var X2 = 0;
 	var Z1 = 1;
@@ -30,7 +31,7 @@ function animate(systemSize) {
 	var drawFlag = true
 	var dt = 0.01 // timestep for tau leaping and forward Euler
 	var frameRate = 10 // 50 milliseconds
-	var offset =  1	// amount to offset graph on each update 
+	var offset =  1// amount to offset graph on each update 
 	var color = "black"
 	
 	var xMax = d3.max(X1, function(d) { return d;} ); 
@@ -217,15 +218,15 @@ function animate(systemSize) {
     
     function step() {
     	// Use tau-leaping with tau = dt for x
-    	rightJumps = poisson(X1*(Y1+0.5)*alpha*dt)
-    	rightLeft = poisson(X2*(Y2+0.5)*beta*dt)
+    	birth = poisson(Y1*r*alpha*dt)
+    	death = poisson(X1*beta*dt)
     	
-   		X1=X1 -rightJumps + rightLeft;
-		X2=X2 +rightJumps - rightLeft;
+   		X1=X1 -death + birth;
+		//X2=X2 +rightJumps - rightLeft;
 
 		// Use forward Euler for Z
-		Z1 = Z1- dt*(Z1*(Y1+0.5)*alpha-Z2*(Y2+0.5)*beta)
-		Z2 = Z2+ dt*(Z1*(Y1+0.5)*alpha-Z2*(Y2+0.5)*beta)
+		Z1 = Z1+ dt*(Y1*alpha-Z1*beta)
+		//Z2 = Z2+ dt*(Z1*(Y1+0.5)*alpha-Z2*(Y2+0.5)*beta)
 		
     	// for y we don't want to use tau-leaping since
     	// it is easy for them to become negative
